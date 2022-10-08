@@ -1,7 +1,9 @@
 import pandas as pd
 import requests
 import json
+import os
 from os.path import exists
+from tqdm import tqdm
 
 def get_player_stats(year: int, player_type: str) -> pd.DataFrame:
     """
@@ -53,6 +55,8 @@ def get_data_season(year_begin: str, year_end: str, path: str):
         url = "https://statsapi.web.nhl.com/api/v1/seasons"+"/"+year_begin+year_end
 
         data_seasons = requests.get(url).json()['seasons']
+
+        
         
         #enregistrer les donnees en format json
         try:
@@ -69,26 +73,49 @@ def get_data_season(year_begin: str, year_end: str, path: str):
         f_open = open(path, 'r')
         return json.load(f_open)
 
-def get_data_play_by_play(gameID: str, path: str):
-    if not exists(path):
-        url = "https://statsapi.web.nhl.com/api/v1/game"+"/"+gameID+"/feed/live"
 
-        data_play_by_play = requests.get(url).json()
-        
-        #enregistrer les donnees en format json
+def get_play_by_play(gameID: str, folder_path: str):
+    """
+    une fonction qui telecharger un play_by_play de ID specifique
+    """
+
+    url = "https://statsapi.web.nhl.com/api/v1/game"+"/"+gameID+"/feed/live"
+    data_play_by_play = requests.get(url).json()
+
+    #verifier si le gameID est valid
+    if(data_play_by_play.get("messageNumber")==2):
+        return None 
+
+    path = folder_path+"/"+gameID+".json"
+    if not exists(path):
+        if not exists(folder_path):
+            os.makedirs(folder_path)
+
         try:
             with open(path,'a',encoding="utf-8") as f:
                 f.write(json.dumps(data_play_by_play,indent=1,ensure_ascii=False)) #si ensure_ascii=False，la valeur retourne peux contient les valuers non ascii
-        except IOError as e:
-            print(str(e))
-        
-        finally:
-            f.close()
+        except Exception as e:
+            print(e)
+            pass
 
         return data_play_by_play
     else:
         f_open = open(path, 'r')
         return json.load(f_open)
+
+
+def get_play_by_play_season_gameType(season_year: str, gameType: str, path: str):
+    """
+    une fonction qui telecharger les play_by_play de un season et un type de game(régulière ou éliminatoires) specifique
+    """
+    gameCount = 1230
+    if int(season_year) >= 2017:
+        gameCount = 1271
+    for i in tqdm(range(gameCount)):
+        gameID = season_year+gameType+str(i).zfill(4)
+        # print(gameID)
+        str_gameType = "regular" if gameType == "02" else "playoff"
+        get_play_by_play(gameID,path+"/"+season_year+"/"+str_gameType)
 
 
     
@@ -100,5 +127,10 @@ def get_data_play_by_play(gameID: str, path: str):
 if __name__ == "__main__":
     # df = get_player_stats(2016, 'goalies')
     # print(df.head())
-    r = get_data_season("2017","2018","data_saved/season_2017_2018.json")
-    r2 = get_data_play_by_play("2017020001","data_saved/play_by_play_2017020001.json")
+    # season_2017 = get_data_season("2017","2018","data_saved/season_2017_2018.json")
+    #play_by_play = get_play_by_play("2017020001","data_saved")
+
+    #play_by_play of playoffs season 2017 
+    get_play_by_play_season_gameType("2017","02","data_saved/play_by_play")
+    #play_by_play of regular season 2017 
+    get_play_by_play_season_gameType("2017","03","data_saved/play_by_play")
