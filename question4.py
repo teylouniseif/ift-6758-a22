@@ -65,7 +65,6 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
             goalStrength.append(ex["result.strength.name"])
             xCoord.append(ex['coordinates.x'])
             yCoord.append(ex['coordinates.y'])
-            print(ex)
         gameDF = pd.DataFrame(gameIDs, columns= ["Game_ID"])
         gameDF = gameDF.assign(Event_ID=eventID, Period_Number=periodNum, Period_Time=periodTime, Game_Time=gameTime,
                                Shot_or_Goal=shotGoal, Shot_Type=shotType, Shooter=shooters, Team_of_Shooter=teamsShot,
