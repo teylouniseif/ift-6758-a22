@@ -1,20 +1,36 @@
 import json
 from os.path import exists
+import os
 
 def match_info(s, t, n):
-  print(t[0])
   if t[0] == "Saison régulière":
     t = 2
   elif t[0] == "Séries éliminatoires":
     t = 3
   id = str(s)+str(t).zfill(2)+str(n).zfill(4)
-  print("data"+"/"+str(s)+"/"+id)
-  #/content/data/2016/2016010000.json
-  file = (json.loads("data"+"/"+str(s)+"/"+id+".json"))
-  print(file)
-  """if "message" in file:
+  with open(os.path.dirname(os.path.abspath(__file__))+"/data/"+str(s)+"/"+id, 'r') as j:
+     contents = json.loads(j.read())
+  if "message" in contents:
     print("Game not available")
-    quit()
+    return
   else:
-    print(file["datetime"])
-    return file["datetime"]"""
+    print(contents["gameData"]['datetime']['dateTime'])
+    print("Game ID :", n+";", contents["gameData"]["teams"]["home"]["abbreviation"],
+    "(home) vs", contents["gameData"]["teams"]["away"]["abbreviation"], "(away)")
+    print("OT")
+    print("       ", "Home  ", "Away")
+    print()
+    table = {"Teams:":[contents["gameData"]["teams"]["home"]["abbreviation"], 
+    contents["gameData"]["teams"]["away"]["abbreviation"]],
+    "Goals:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["goals"], 
+    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["goals"]],
+    "SoG:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["shots"],
+    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["shots"]],
+    "SO Goals:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["shots"],
+    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["shots"]],
+    "SO Attempts:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["shots"],
+    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["shots"]]}
+    for k, v in table.items():
+      home, away = v
+      print(k, home, away)
+    return 
