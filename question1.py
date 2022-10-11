@@ -74,7 +74,7 @@ def get_data_season(year_begin: str, year_end: str, path: str):
         return json.load(f_open)
 
 
-def get_play_by_play(gameID: str, folder_path: str):
+def get_play_by_play(gameID: str, folder_path: str) -> dict:
     """
     une fonction qui telecharger un play_by_play de ID specifique
     """
@@ -101,6 +101,7 @@ def get_play_by_play(gameID: str, folder_path: str):
         return data_play_by_play
     else:
         f_open = open(path, 'r')
+        # print("exist")
         return json.load(f_open)
 
 
@@ -131,6 +132,34 @@ if __name__ == "__main__":
     #play_by_play = get_play_by_play("2017020001","data_saved")
 
     #play_by_play of playoffs season 2017 
-    get_play_by_play_season_gameType("2017","02","data_saved/play_by_play")
+    # get_play_by_play_season_gameType("2017","02","data_saved/play_by_play")
     #play_by_play of regular season 2017 
-    get_play_by_play_season_gameType("2017","03","data_saved/play_by_play")
+    # get_play_by_play_season_gameType("2017","03","data_saved/play_by_play")
+
+
+    play_by_play = get_play_by_play("2017020001","data_saved/play_by_play/2017/regular")
+
+    dictlist=[]
+
+    # for keys, value in play_by_play["liveData"]["plays"].items():
+    #     # 键和值都要
+    #     temp = (keys,value)
+    #     dictlist.append(temp)
+    # print(play_by_play["liveData"]["plays"]["allPlays"][10]["result"]["event"])
+    # print(play_by_play["liveData"]["decisions"])
+
+    allplays = play_by_play["liveData"]["plays"]["allPlays"]
+   
+    count = 0
+    for i in range(len(allplays)):
+        # print(allplays[i])
+        if(allplays[i]["result"]["event"] == "Shot" or allplays[i]["result"]["event"] == "Goal"):
+            count = count+1
+            # print(i)
+    print(count)
+
+    # count = 0
+    # for i in range(len(allplays[284]["players"])):
+    #     if(allplays[284]["players"][i]["playerType"]=="Scorer"):
+    #         print(allplays[284]["players"][i]["player"]["fullName"])
+           
