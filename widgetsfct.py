@@ -1,8 +1,10 @@
 import json
 from os.path import exists
 import os
+import matplotlib.pyplot as plt
+from hockey_rink import NHLRink
 
-def match_info(s, t, n):
+def match_info(s, t, n, e):
   if t[0] == "Saison régulière":
     t = 2
   elif t[0] == "Séries éliminatoires":
@@ -14,23 +16,42 @@ def match_info(s, t, n):
     print("Game not available")
     return
   else:
+
     print(contents["gameData"]['datetime']['dateTime'])
+    
     print("Game ID :", n+";", contents["gameData"]["teams"]["home"]["abbreviation"],
     "(home) vs", contents["gameData"]["teams"]["away"]["abbreviation"], "(away)")
+
     print("OT")
     print("       ", "Home  ", "Away")
     print()
+    home = contents["liveData"]["boxscore"]["teams"]["home"]
+    away = contents["liveData"]["boxscore"]["teams"]["away"]
+
     table = {"Teams:":[contents["gameData"]["teams"]["home"]["abbreviation"], 
     contents["gameData"]["teams"]["away"]["abbreviation"]],
-    "Goals:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["goals"], 
-    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["goals"]],
-    "SoG:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["shots"],
-    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["shots"]],
-    "SO Goals:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["shots"],
-    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["shots"]],
-    "SO Attempts:":[contents["liveData"]["boxscore"]["teams"]["home"]["teamStats"]["teamSkaterStats"]["shots"],
-    contents["liveData"]["boxscore"]["teams"]["away"]["teamStats"]["teamSkaterStats"]["shots"]]}
+    "Goals:":[home["teamStats"]["teamSkaterStats"]["goals"], 
+    away["teamStats"]["teamSkaterStats"]["goals"]],
+    "SoG:":[home["teamStats"]["teamSkaterStats"]["shots"],
+    away["teamStats"]["teamSkaterStats"]["shots"]],
+    "SO Goals:":[home["teamStats"]["teamSkaterStats"]["shots"],
+    away["teamStats"]["teamSkaterStats"]["shots"]],
+    "SO Attempts:":[home["teamStats"]["teamSkaterStats"]["shots"],
+    away["teamStats"]["teamSkaterStats"]["shots"]]}
     for k, v in table.items():
       home, away = v
       print(k, home, away)
+    
+    e = int(e)
+
+    print("Event n°", e, "over", contents["liveData"]["plays"]["currentPlay"]["about"]["eventIdx"])
+    play = contents["liveData"]["plays"]["allPlays"][e]
+    print(play["result"]["description"])
+    print(play["about"]["periodTime"])
+
+    rink = NHLRink(x_shift=100, y_shift=42.5, nzone={"length": 50})
+    ax = rink.draw()
+    if play["coordinates"]!={} and play["coordinates"]!={}:
+      rink.scatter(play["coordinates"]["x"], play["coordinates"]["y"])
+    
     return 
