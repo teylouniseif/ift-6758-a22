@@ -93,18 +93,17 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
                                    Goalie=goalies, Empty_Net=emptyNet, Goal_Strength=goalStrength, X_Coordinate=xCoord,
                                    Y_Coordinate=yCoord)
     except Exception as e:
-        print(e)
+        pass
     return gameDF
 
 if __name__ == "__main__":
-        #df = get_df_from_game(r"C:\Users\raph_\PycharmProjects\DS-GroupProject\data_saved\play_by_play\2017\regular\2017020462.json")
-        #with pd.option_context('display.max_rows', None,
-#                               'display.max_columns', None,
-#                               'display.precision', 3,
-#                               ):
-#            print(df)
-    directory = r'data_saved'
-    df = create_full_df(directory=directory)
-    print(df)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    df = get_df_from_game(os.path.join(current_dir,'data/2017', "2017010003.json"))
+    with pd.option_context('display.max_rows', None,
+                           'display.max_columns', None,
+                           'display.precision', 3,
+                           ):
+        print(df)
+    df = create_full_df(directory=os.path.join(current_dir,'data/2017'))
 
 
