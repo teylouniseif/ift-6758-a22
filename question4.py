@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import tqdm
 import os
+import numpy as np
 
 #The function create_full_df can now create a DF with all files in a directory
 
@@ -11,6 +12,8 @@ def create_full_df(directory: str)->pd.DataFrame:
     """
     Function that takes a directory of json game files, iterates through all of them to create a pd.Dataframe
     where each event of every match of every season in te directory represent one row.
+    The function is recursive: If there is a directory inside the directory originally called, the function will call
+    itself on the sub-directory
     Only the events of type "Shot" and "Goal" are added to the dataframe
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,6 +42,8 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
         rawDF = rawDF[rawDF['result.event'].isin(["Goal","Shot"])]
         gameIDs = [gameID]*len(rawDF)
         eventID = []
+        home = data['gameData']['teams']['home']['triCode']
+        away = data['gameData']['teams']['away']['triCode']
         periodNum = []
         periodTime= []
         gameTime = []
@@ -51,6 +56,7 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
         goalStrength = []
         xCoord = []
         yCoord = []
+        distances = []
 
         for (i, ex) in (rawDF.iterrows()):
             #Making sure the shooter and goalie name are accessed properly and that any "assist" is ignored
@@ -58,12 +64,24 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
                 if (ex['players'][i]["playerType"] == "Shooter" or ex['players'][i]["playerType"] == "Scorer"):
                     shooters.append(ex['players'][i]["player"]["fullName"])
             goalie = ""
+            goalieSide = ""
             for i in range(len(ex['players'])):
                 if (ex['players'][i]["playerType"] == "Goalie"):
                     goalie = ex['players'][i]["player"]["fullName"]
                     goalies.append(goalie)
             if goalie == "":
                 goalies.append("None")
+            if ex["team.triCode"]==home:
+                try:
+                    goalieSide = data["liveData"]["linescore"]["periods"][ex["about.period"]+1]["away"]["rinkSide"]
+                except:
+                    pass
+            elif ex["team.triCode"]==away:
+                try:
+                    goalieSide = data["liveData"]["linescore"]["periods"][ex["about.period"] + 1]["home"]["rinkSide"]
+                except:
+                    pass
+            distances.append(get_distance(ex['coordinates.x'], ex['coordinates.y'], goalieSide))
             eventID.append(ex["about.eventIdx"])
             periodNum.append(ex["about.period"])
             periodTime.append(ex["about.periodTime"])
@@ -91,10 +109,20 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
         gameDF = gameDF.assign(Event_ID=eventID, Period_Number=periodNum, Period_Time=periodTime, Game_Time=gameTime,
                                    Shot_or_Goal=shotGoal, Shot_Type=shotType, Shooter=shooters, Team_of_Shooter=teamsShot,
                                    Goalie=goalies, Empty_Net=emptyNet, Goal_Strength=goalStrength, X_Coordinate=xCoord,
-                                   Y_Coordinate=yCoord)
+                                   Y_Coordinate=yCoord, Distance=distances)
     except Exception as e:
-        print(e)
+        pass
     return gameDF
+
+def get_distance(XCoord: int, YCoord: int, goalSide: str) -> object:
+    distance = -1
+    if goalSide == "":
+        distance = min(get_distance(XCoord, YCoord, "left"),get_distance(XCoord, YCoord, "right"))
+    elif goalSide == "left":
+        distance = np.sqrt((XCoord+90)**2+(YCoord)**2)
+    elif goalSide == "right":
+        distance = np.sqrt((XCoord-90)**2+(YCoord)**2)
+    return distance
 
 if __name__ == "__main__":
         #df = get_df_from_game(r"C:\Users\raph_\PycharmProjects\DS-GroupProject\data_saved\play_by_play\2017\regular\2017020462.json")
@@ -102,9 +130,9 @@ if __name__ == "__main__":
 #                               'display.max_columns', None,
 #                               'display.precision', 3,
 #                               ):
-#            print(df)
     directory = r'data_saved'
     df = create_full_df(directory=directory)
     print(df)
+
 
 
