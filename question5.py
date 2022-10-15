@@ -23,8 +23,8 @@ def get_Chances_Goal(list):
                     count += 1
             chances.append(count/len(ex))
     except Exception as e:
-        pass
-    print(chances)
+        chances.append(0.0)
+    return(chances)
 
 if __name__ == "__main__":
     directory = r'data_saved'
