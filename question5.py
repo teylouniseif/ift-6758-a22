@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 import seaborn as sns
+from question4 import *
 
 #The function create_full_df can now create a DF with all files in a directory
 
@@ -17,7 +18,7 @@ def plot_shots_as_stacked_bars(shots: pd.Series, goals: pd.Series)->pd.DataFrame
     Only the events of type "Shot" and "Goal" are added to the dataframe
     """
 
-    
+
     shots = shots.sort_values(ascending=True)
     goals = goals.reindex(shots.index.values)
     goals = goals.divide(shots)*100
@@ -70,3 +71,30 @@ def aggregate_over_shot_types(df: pd.DataFrame)->(pd.Series, pd.Series):
     print(shots)
     print(goals)
     return (shots, goals)
+
+def split_DF_by_Distances(df: pd.DataFrame):
+    metaDF = []
+    for i in range(40):
+        df1 = df[df['Distance']>= i*5]
+        df1 = df1[df1['Distance']< (i*5)+5]
+        metaDF.append(df1)
+    return metaDF
+
+def get_Chances_Goal(list):
+    chances = []
+    try:
+        for (i,ex) in enumerate(list):
+            count = 0
+            for event in ex.iterrows():
+                if event[1][5]=="Goal":
+                    count += 1
+            chances.append(count/len(ex))
+    except Exception as e:
+        chances.append(0.0)
+    return(chances)
+
+if __name__ == "__main__":
+    directory = r'data_saved'
+    df = create_full_df(directory=directory)
+    splitDF = split_DF_by_Distances(df)
+    get_Chances_Goal(splitDF)
