@@ -159,10 +159,11 @@ def get_coords_transform(df):
     return x, y
 
 def league_avg_shot_hour(df, print_rink=True):
+    #Compute the avg shot per match by dividing the number of line in the df by the number of match (number of unique id in df)
     avg_shot_hour = df.shape[0]/df["Game_ID"].nunique()
 
     if print_rink:
-        
+        #If true offers, the possibility to print on a hockey rink the average position of the points
         x = df["X_Coordinate"].abs()
         y = df["Y_Coordinate"]
         x_avg = x.sum()/x.shape[0]
@@ -170,7 +171,6 @@ def league_avg_shot_hour(df, print_rink=True):
         x_avg_image =  (x_avg/100) * 550
         y_avg_image = 233.5 + (y_avg/42.5) * 233.5 if y_avg>0 else  233.5 - (-y_avg/42.5) * 233.5
         print("x:",x_avg, "y:", y_avg)
-
         
         print_points_plotly(pd.Series(x_avg_image),pd.Series(y_avg_image))
 
@@ -189,11 +189,14 @@ def excess_shot_rate_hour(df):
     #Compute the average of shot per game (Multiply by 2 to compensate the 2 teams)
     excess_hour = (shot_df/game_df)*2
 
+    #Substract the avg shot per match to all teams avg per match
     return excess_hour-league_avg_shot_hour(df, False)
 
 def KernelD(df) -> pd.DataFrame:
+    #Keeps useful columns, removes NAN lines, and values between shot and goal types (starting by shot)
     df = df[["Shot_or_Goal", "X_Coordinate", "Y_Coordinate"]].dropna(axis=0).sort_values(by="Shot_or_Goal", ascending=0).reset_index(drop=True)
 
+    #Turn the coordinates of the goals and the shots in numpy arrays
     goal = df.loc[df.Shot_or_Goal == "Goal"].reset_index(drop = True)[["X_Coordinate", "Y_Coordinate"]].to_numpy()
     shot = df.loc[df.Shot_or_Goal == "Shot"].reset_index(drop = True)[["X_Coordinate", "Y_Coordinate"]].to_numpy()
 
@@ -203,11 +206,16 @@ def KernelD(df) -> pd.DataFrame:
     shot_goal_d = list()
 
     for i in range(len(types)):
+        #For every type, train a Kernel density estimator and save its predictions for the type coordinates in shot_goal_d
         kde = KernelDensity(bandwidth=0.03, kernel = 'gaussian')
         kde.fit(shot_goal[i])
         density = np.exp(kde.score_samples(shot_goal[i]))
         shot_goal_d.append(density)
+
+    #Mix all the predictions in a 1D numpy array
     shot_goal_d = np.concatenate((shot_goal_d[0], shot_goal_d[1]))
+
+    #Add a new column in the df with the density
     df["KDensity"] = np.vstack(shot_goal_d)
     return df
 
