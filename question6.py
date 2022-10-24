@@ -178,18 +178,18 @@ def league_avg_shot_hour(df, print_rink=True):
 
 def excess_shot_rate_hour(df):
     #Copy only the elements we want
-    df = df[["Team_of_Shooter", "Shot_or_Goal", "Game_ID"]].copy()
+    ndf = df[["Team_of_Shooter", "Shot_or_Goal", "Game_ID"]].copy()
 
     #Count how many shots/goals a team has made in the season
-    shot_df = df.groupby(["Team_of_Shooter"])["Shot_or_Goal"].count()
+    shot_df = ndf.groupby(["Team_of_Shooter"])["Shot_or_Goal"].count()
 
     #Count how many game a team has played
-    game_df = df[["Team_of_Shooter","Game_ID"]].drop_duplicates().groupby(["Team_of_Shooter"])["Game_ID"].count()
+    game_df = ndf[["Team_of_Shooter","Game_ID"]].drop_duplicates().groupby(["Team_of_Shooter"])["Game_ID"].count()
 
     #Compute the average of shot per game (Multiply by 2 to compensate the 2 teams)
     excess_hour = (shot_df/game_df)*2
 
-    return excess_hour
+    return excess_hour-league_avg_shot_hour(df, False)
 
 def KernelD(df) -> pd.DataFrame:
     df = df[["Shot_or_Goal", "X_Coordinate", "Y_Coordinate"]].dropna(axis=0).sort_values(by="Shot_or_Goal", ascending=0).reset_index(drop=True)
