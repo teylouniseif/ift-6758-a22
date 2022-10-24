@@ -49,9 +49,10 @@ def plot_shots_as_bubble_chart(shots: pd.Series, goals: pd.Series)->pd.DataFrame
     sns.set(rc = {'figure.figsize':(15,8)})
     data = pd.DataFrame({'shots':shots.values, 'goals %':goals.values, 'Shot type': shots.index})
     # use the scatterplot function
-    sns.scatterplot(data=data, x="Shot type", y="shots", size="goals %", palette="viridis", edgecolors="black", alpha=0.5, sizes=(10, 1000))
+    sns.scatterplot(data=data, x="Shot type", y="shots", size="goals %", palette="viridis", edgecolors="black", alpha=0.5, sizes=(200, 1000))
         # Add titles (main and on axis)
     plt.ylabel("Number of shots")
+    plt.savefig('goal_percentage.png')
     plt.show()
 
 def plot_shot_placements_as_bubble_chart(shots: pd.Series, goals: pd.Series)->pd.DataFrame:
@@ -71,6 +72,7 @@ def plot_shot_placements_as_bubble_chart(shots: pd.Series, goals: pd.Series)->pd
         # Add titles (main and on axis)
     plt.ylabel("Goal %")
     plt.xlabel("Distance from the net (in feet)")
+    plt.savefig('shot_distance.png')
     plt.show()
 
 def aggregate_over_shot_types(df: pd.DataFrame, include_range=False)->(pd.Series, pd.Series):

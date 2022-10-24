@@ -91,7 +91,9 @@ entree: x, y sont les pandas.series qui contient les cordonnees x et y
  
 """
 def print_points_plotly(x,y):
-    I = Image.open('/Users/hrh/Desktop/programmeFile/dataSicence/projet/ift-6758-a22/figures/nhl_rink.png')
+    path = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(path,'figures/nhl_rink.png')
+    I = Image.open(path)
     box = (I.size[0]/2,0,I.size[0],I.size[1])
     imgcut = I.crop(box)
 
