@@ -219,53 +219,134 @@ def KernelD(df) -> pd.DataFrame:
     df["KDensity"] = np.vstack(shot_goal_d)
     return df
 
+#deviser le rink en 16 regions
+def diviser_region(df_team: pd.DataFrame):
+    dfs_X = []
+    df_regions = []
+    for i in range(4):
+        dfs_X.append(df_team[(df_team['X_Coordinate'].abs()>i*25) & (df_team['X_Coordinate'].abs()<=(i+1)*25)])
+
+
+    for df_X in dfs_X:
+        for i in range(2):
+            df_regions.append(df_X[(df_X['Y_Coordinate']>=i*21.25) & (df_X['Y_Coordinate']<(i+1)*21.25)])
+        for i in range(2):
+            df_regions.append(df_X[(df_X['Y_Coordinate']<i*-21.25) & (df_X['Y_Coordinate']>=(i+1)*-21.25)])
+
+
+    return df_regions
+
 """
 Une méthode permettant de dessiner les coordonnées de tirs de tous les équipes sur le figure pour une année donnée, mais ces points sont temporairement invisibles.
-annee: 2016-2020
+annee: 2016-2020, pour les regions qui a le excess_shot_rate_hour positive, dessniner les point rouge, sinon les points bleu
 """
-def add_points_eachTeam(df, fig : Figure , teams):
-    # teams = list(set(df["Team_of_Shooter"].tolist()))
+def add_points_eachTeam(df, fig : go.Figure , teams):
+    dfs_regions = diviser_region(df)
     for i in range(len(teams)):
-        x, y = get_coords_transform(df.loc[df["Team_of_Shooter"]==teams[i]])
-        #par default le premier team est visible!
-        if(i==0):
-            fig.add_trace(
-            go.Scatter(x=x,
-            y=y,
-            mode="markers",
-            marker=dict(color="blue",size=7),
-            visible=True)
-            )
-        else:
-            fig.add_trace(
-            go.Scatter(x=x,
-                y=y,
-                mode="markers",
-                marker=dict(color="blue",size=7),
-                visible=False)
-                )
+        for df_region in dfs_regions:
+            excess_hour_region =excess_shot_rate_hour(df_region)
+            excess_hour_region_team = excess_hour_region[teams[i]]
+            df__region_team = df_region.loc[df_region["Team_of_Shooter"]==teams[i]]
+            x, y = get_coords_transform(df__region_team)
+            if(excess_hour_region_team > 0): #si positive , dessiner les points rouge
+                if(i==0):
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                    y=y,
+                    mode="markers",
+                    marker=dict(color="red",size=3),
+                    showlegend=False,
+                    visible=True)
+                    )
+                else:
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                        y=y,
+                        mode="markers",
+                        marker=dict(color="red",size=3),
+                        showlegend=False,
+                        visible=False)
+                        )
+            else:#si negative , dessiner les points bleus
+                if(i==0):
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                    y=y,
+                    mode="markers",
+                    marker=dict(color="blue",size=3),
+                    showlegend=False,
+                    visible=True)
+                    )
+                else:
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                        y=y,
+                        mode="markers",
+                        marker=dict(color="blue",size=3),
+                        showlegend=False,
+                        visible=False)
+                        )
+                
+        
+        
+       
+                
+        
+
 """
 Une méthode permettant de dessiner les coordonnées de tirs de tous les annees sur le figure pour une equipe donnée, mais ces points sont temporairement invisibles.
 """
-def add_points_eachYear(df_years : list, fig : Figure):
+def add_points_eachYear(df_years : list, fig : go.Figure, team):
     for i in range(len(df_years)):
-        x, y = get_coords_transform(df_years[i])
-        if(i==0):
-            fig.add_trace(
-            go.Scatter(x=x,
-            y=y,
-            mode="markers",
-            marker=dict(color="blue",size=7),
-            visible=True)
-            )
-        else:
-            fig.add_trace(
-            go.Scatter(x=x,
-                y=y,
-                mode="markers",
-                marker=dict(color="blue",size=7),
-                visible=False)
-                )
+        dfs_team_region = diviser_region(df_years[i])
+        for df_region in dfs_team_region:
+            excess_hour_region =excess_shot_rate_hour(df_region)
+            excess_hour_region_team = excess_hour_region[team]
+            df__region_team = df_region.loc[df_region["Team_of_Shooter"]==team]
+            x, y = get_coords_transform(df__region_team)
+            if(excess_hour_region_team > 0): #si positive , dessiner les points rouge
+                if(i==0):
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                    y=y,
+                    mode="markers",
+                    marker=dict(color="red",size=3),
+                    showlegend=False,
+                    visible=True)
+                    )
+                else:
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                        y=y,
+                        mode="markers",
+                        marker=dict(color="red",size=3),
+                        showlegend=False,
+                        visible=False)
+                        )
+            else:#si negative , dessiner les points bleus
+                if(i==0):
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                    y=y,
+                    mode="markers",
+                    marker=dict(color="blue",size=3),
+                    showlegend=False,
+                    visible=True)
+                    )
+                else:
+                    fig.add_trace(
+                    go.Scatter(x=x,
+                        y=y,
+                        mode="markers",
+                        marker=dict(color="blue",size=3),
+                        showlegend=False,
+                        visible=False)
+                        )
+            
+
+
+
+
 
 
 """
@@ -286,9 +367,11 @@ def print_cordonne_tir_eachTeam(year):
         visibles = []
         for j in range(len(teams)):
             if j==i:
-                visibles.append(True)
+                for n in range(16):
+                    visibles.append(True)
             else:
-                visibles.append(False)
+                for m in range(16):
+                    visibles.append(False)
         
         list_drop_down.append(dict(label=teams[i],
                         method="update",
@@ -299,6 +382,8 @@ def print_cordonne_tir_eachTeam(year):
     updatemenus=[dict(buttons=list_drop_down)])
 
     fig.show()
+    return fig
+
 
 """
 Une méthode qui peut creer un graphique interactif pour chaque saison de 2016-17 à 2020-2021. 
@@ -314,12 +399,11 @@ def print_cordonne_tir_eachYear(team):
     df2016 = create_full_df(directory=directory2016)
     df2019 = create_full_df(directory=directory2019)
     df2020 = create_full_df(directory=directory2020)
-    df_years = [df2016.loc[df2016["Team_of_Shooter"]==team],df2017.loc[df2017["Team_of_Shooter"]==team],df2018.loc[df2018["Team_of_Shooter"]==team],
-    df2019.loc[df2019["Team_of_Shooter"]==team],df2020.loc[df2020["Team_of_Shooter"]==team]]
+    df_years = [df2016,df2017,df2018,df2019,df2020]
 
     fig = get_blank_rink_plotly()
     
-    add_points_eachYear(df_years,fig)
+    add_points_eachYear(df_years,fig,team)
 
     years = ["2016","2017","2018","2019","2020"]
 
@@ -328,9 +412,11 @@ def print_cordonne_tir_eachYear(team):
         visibles = []
         for j in range(len(years)):
             if j==i:
-                visibles.append(True)
+                for n in range(16):
+                    visibles.append(True)
             else:
-                visibles.append(False)
+                for n in range(16):
+                    visibles.append(False)
         
         list_drop_down.append(dict(label=years[i],
                         method="update",
@@ -341,8 +427,9 @@ def print_cordonne_tir_eachYear(team):
     updatemenus=[dict(buttons=list_drop_down)])
 
     fig.show()
-    
+    return fig
 
+    
 
 
 if __name__ == "__main__":
