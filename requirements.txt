@@ -12,3 +12,4 @@ librosa
 requests
 tqdm
 plotly
+sklearn

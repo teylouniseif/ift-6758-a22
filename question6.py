@@ -11,6 +11,7 @@ import ipywidgets as widgets
 from IPython.display import display
 import numpy as np
 from question4 import *
+from sklearn.neighbors import KernelDensity
 # from matplotlib.widgets import Button
 
 
@@ -189,6 +190,26 @@ def excess_shot_rate_hour(df):
     excess_hour = (shot_df/game_df)*2
 
     return excess_hour
+
+def KernelD(df) -> pd.DataFrame:
+    df = df[["Shot_or_Goal", "X_Coordinate", "Y_Coordinate"]].dropna(axis=0).sort_values(by="Shot_or_Goal", ascending=0).reset_index(drop=True)
+
+    goal = df.loc[df.Shot_or_Goal == "Goal"].reset_index(drop = True)[["X_Coordinate", "Y_Coordinate"]].to_numpy()
+    shot = df.loc[df.Shot_or_Goal == "Shot"].reset_index(drop = True)[["X_Coordinate", "Y_Coordinate"]].to_numpy()
+
+    shot_goal = [shot, goal]
+    types = ["Shots", "Goals"]
+
+    shot_goal_d = list()
+
+    for i in range(len(types)):
+        kde = KernelDensity(bandwidth=0.03, kernel = 'gaussian')
+        kde.fit(shot_goal[i])
+        density = np.exp(kde.score_samples(shot_goal[i]))
+        shot_goal_d.append(density)
+    shot_goal_d = np.concatenate((shot_goal_d[0], shot_goal_d[1]))
+    df["KDensity"] = np.vstack(shot_goal_d)
+    return df
 
 """
 Une méthode permettant de dessiner les coordonnées de tirs de tous les équipes sur le figure pour une année donnée, mais ces points sont temporairement invisibles.
