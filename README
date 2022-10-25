@@ -1,0 +1,16 @@
+Steps to run blog on Jekyll:
+
+unzip blogDSGroupProject.zip
+
+cd blogDSGroupProject
+
+bundle install
+
+bundle exec jekyll serve
+
+
+Steps to run notebook:
+
+Install with pip requirements.txt
+
+use jupyter-lab command
