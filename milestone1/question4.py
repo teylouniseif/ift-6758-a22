@@ -3,6 +3,7 @@ import json
 import tqdm
 import os
 import numpy as np
+import math
 
 #The function create_full_df can now create a DF with all files in a directory
 
@@ -57,6 +58,9 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
         xCoord = []
         yCoord = []
         distances = []
+        angles = []
+        est_un_buts = []
+        filet_vides = []
 
         for (i, ex) in (rawDF.iterrows()):
             #Making sure the shooter and goalie name are accessed properly and that any "assist" is ignored
@@ -81,7 +85,9 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
                     goalieSide = data["liveData"]["linescore"]["periods"][ex["about.period"] + 1]["home"]["rinkSide"]
                 except:
                     pass
-            distances.append(get_distance(ex['coordinates.x'], ex['coordinates.y'], goalieSide))
+            dis,angle = get_distance_angle(ex['coordinates.x'], ex['coordinates.y'], goalieSide)
+            distances.append(dis)
+            angles.append(angle)
             eventID.append(ex["about.eventIdx"])
             periodNum.append(ex["about.period"])
             periodTime.append(ex["about.periodTime"])
@@ -96,6 +102,10 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
                 time[1] = 00
             gameTime.append(float(str(time[0])+'.'+str(time[1])))
             shotGoal.append(ex["result.event"])
+            est_un_but = 1 if ex["result.event"] == 'Goal' else 0
+            est_un_buts.append(est_un_but)
+            is_empty_net = 1 if ex["result.emptyNet"] else 0
+            filet_vides.append(is_empty_net)
             shotType.append(ex["result.secondaryType"])
             teamsShot.append(ex["team.triCode"])
             try:
@@ -109,7 +119,7 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
         gameDF = gameDF.assign(Event_ID=eventID, Period_Number=periodNum, Period_Time=periodTime, Game_Time=gameTime,
                                    Shot_or_Goal=shotGoal, Shot_Type=shotType, Shooter=shooters, Team_of_Shooter=teamsShot,
                                    Goalie=goalies, Empty_Net=emptyNet, Goal_Strength=goalStrength, X_Coordinate=xCoord,
-                                   Y_Coordinate=yCoord, Distance=distances)
+                                   Y_Coordinate=yCoord, Distance=distances, Angle = angles , Est_un_but = est_un_buts, Filet_vide = filet_vides)
     except Exception as e:
         pass
     return gameDF
@@ -123,6 +133,52 @@ def get_distance(XCoord: int, YCoord: int, goalSide: str) -> object:
     elif goalSide == "right":
         distance = np.sqrt((XCoord-90)**2+(YCoord)**2)
     return distance
+
+"""
+fonction ajouter par Hanrui:
+une fonction qui calculer le distance et le angle d'un tir/but,
+la calculation des distance se base sur le methode get_distance
+"""
+def get_distance_angle(XCoord: int, YCoord: int, goalSide: str) -> object:
+    distance = -1
+    angle = 0
+    dis_horizontale = 0
+    if goalSide == "":
+        distance_left,angle_left = get_distance_angle(XCoord, YCoord, "left")
+        distance_right,angle_right = get_distance_angle(XCoord, YCoord, "right")
+        distance = min(distance_left,distance_right)
+        angle = angle_left if distance == distance_left else angle_right
+    elif goalSide == "left":
+        dis_horizontale = 90 + XCoord        
+        distance = np.sqrt((dis_horizontale)**2+(YCoord)**2)
+
+        #Cela représente un tir à l'avant du filet.
+        if YCoord == 0:
+            angle = 0
+        #L'angle entre le joueur et le filet est de 90 degrés, ce qui signifie que le joueur tire du côté du filet et qu'il est presque impossible de marquer.
+        elif dis_horizontale==0:
+            angle = 90
+        else:
+            angle = math.degrees(math.acos((YCoord**2-dis_horizontale**2-distance**2)/(-2*np.abs(dis_horizontale)*distance)))
+        if YCoord<0:
+            angle = -angle
+    elif goalSide == "right":
+        dis_horizontale = 90 - XCoord    
+        distance = np.sqrt((dis_horizontale)**2+(YCoord)**2)  
+        #Cela représente un tir à l'avant du filet.     
+        if YCoord == 0:
+            angle = 0
+         #L'angle entre le joueur et le filet est de 90 degrés, ce qui signifie que le joueur tire du côté du filet et qu'il est presque impossible de marquer.
+        elif dis_horizontale==0:
+            angle = 90
+        else:
+            angle = math.degrees(math.acos((YCoord**2-dis_horizontale**2-distance**2)/(-2*np.abs(dis_horizontale)*distance)))
+        if YCoord>0:
+            angle = -angle
+   
+    return distance,angle
+    
+    
 
 if __name__ == "__main__":
         #df = get_df_from_game(r"C:\Users\raph_\PycharmProjects\DS-GroupProject\data_saved\play_by_play\2017\regular\2017020462.json")

@@ -5,12 +5,12 @@ from matplotlib.figure import Figure
 import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
-import question4
+import milestone1.question4 as question4
 import plotly.graph_objects as go
 import ipywidgets as widgets
 from IPython.display import display
 import numpy as np
-from question4 import *
+from milestone1.question4 import *
 from sklearn.neighbors import KernelDensity
 # from matplotlib.widgets import Button
 

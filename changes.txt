@@ -1,0 +1,8 @@
+2022-11-09:
+    1.J'ai change l'emplacement des tous les fichers des milestone1, et les depose dans le chemain 'ift-6758-a22/milestone1' pour  des raisons de lisibilité，
+    donc les chemins des fichiers data_saved son changes , et vous pouvez ragarder les exemples d'executions dans le fichier test.ipynb pour
+    commprends comment telechargers les fichiers et comment creers les dfs dans pour milestone2.
+    2.j'ai ajouters les nouveau 3 colonnes dans le data_frame: (1)Angle relatif au filet, (2)est un but (0 ou 1), (3)Filet vide (0 ou 1)
+
+
+

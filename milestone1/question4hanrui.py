@@ -3,7 +3,7 @@ from cmath import nan
 import random
 import pandas as pd
 import numpy as np
-from question1 import get_play_by_play
+from milestone1.question1 import get_play_by_play
 class DataCleaner:
 
     def __init__(self):

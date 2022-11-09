@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 import seaborn as sns
-from question4 import *
+from milestone1.question4 import *
 import matplotlib.colors as mcolors
 
 #The function create_full_df can now create a DF with all files in a directory
