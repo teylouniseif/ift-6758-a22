@@ -104,7 +104,7 @@ def get_df_from_game(filePath: str)->pd.DataFrame:
             shotGoal.append(ex["result.event"])
             est_un_but = 1 if ex["result.event"] == 'Goal' else 0
             est_un_buts.append(est_un_but)
-            is_empty_net = 1 if ex["result.emptyNet"] else 0
+            is_empty_net = 1 if ex["result.emptyNet"] and not math.isnan(ex["result.emptyNet"]) else 0           
             filet_vides.append(is_empty_net)
             shotType.append(ex["result.secondaryType"])
             teamsShot.append(ex["team.triCode"])
