@@ -6,10 +6,13 @@ import matplotlib.pyplot as plt
 
 def logistic_regression(X_train,y_train, X_test: np.array):
     clf = LogisticRegression()
-    X_test = np.array(X_test)
-    X_train = np.array(X_train)
-    X_test = X_test.reshape(-1, 1)
-    X_train = X_train.reshape(-1, 1)
+    try:
+        dim = len(X_train.axes[1])
+    except:
+        X_test = np.array(X_test)
+        X_train = np.array(X_train)
+        X_test = X_test.reshape(-1, 1)
+        X_train = X_train.reshape(-1, 1)
     clf.fit(X_train,y_train)
     y_score = clf.predict(X_test)
     y_prob = clf.predict_proba(X_test)
