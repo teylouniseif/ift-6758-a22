@@ -7,3 +7,7 @@
 2022-11-10 (RT):
     J'ai ajoute 2 fichiers, un notebook et un python file. Ils repondent ensemble aux deux premieres sous-questions de la Question 3 (3.1,3.2)
 
+2022-11-13 (Noe):
+    J'ai fait les 3 premieres questions de la 4, ainsi que la 4eme mais elle est très lente et n'est donc pas eu le temps de la tester (voir fichier question 4).
+
+
