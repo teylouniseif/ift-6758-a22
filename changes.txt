@@ -4,5 +4,6 @@
     commprends comment telechargers les fichiers et comment creers les dfs dans pour milestone2.
     2.j'ai ajouters les nouveau 3 colonnes dans le data_frame: (1)Angle relatif au filet, (2)est un but (0 ou 1), (3)Filet vide (0 ou 1)
 
-
+2022-11-10 (RT):
+    J'ai ajoute 2 fichiers, un notebook et un python file. Ils repondent ensemble aux deux premieres sous-questions de la Question 3 (3.1,3.2)
 
