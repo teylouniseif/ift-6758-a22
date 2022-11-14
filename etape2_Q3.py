@@ -4,7 +4,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def logistic_regression(X_train,y_train, X_test: np.array):
+
+#Creates a logistic regression instance, trains it on the provided training set et labels and returns the prediction (score) and probability
+#Of every test point, as well as the logistic regression instance
+def logistic_regression(X_train, y_train, X_test: np.array):
     clf = LogisticRegression()
     try:
         dim = len(X_train.axes[1])
@@ -18,11 +21,14 @@ def logistic_regression(X_train,y_train, X_test: np.array):
     y_prob = clf.predict_proba(X_test)
     return y_score, y_prob, clf
 
+#For an array of probability (y_prob) and the corresponding labels (y_test), returns the fpr, tpr and auc
 def get_roc_data(y_prob, y_test: np.array):
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     roc_auc = auc(fpr, tpr)
     return fpr, tpr, roc_auc
 
+#For an array of probability (y_prob) and the corresponding labels (y_test), assigns a probability for every percentile (fromm 100 to 0 in that order)
+#and returns an array with the percentile (perc), an array with the values of each percentile (perc_values) and the number of goals scored in each percentile
 def get_percentile_goal_chance(y_prob, y_test: np.array):
     perc = range(1,101)
     perc = np.array(perc)
