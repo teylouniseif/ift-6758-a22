@@ -13,3 +13,4 @@ requests
 tqdm
 plotly
 sklearn
+comet_ml
