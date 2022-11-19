@@ -11,3 +11,8 @@
     J'ai fait les 4 parties obligatoires de la question 4, ainsi que la 4eme mais elle est trop lente donc je vais la modifier. 
 
 
+2022-11-19 (Hanrui):
+    J'ai fait une nouveau version de q4, cette version corrige tous les problemes de la premiere version. Vous pouvez regarder les fihcier q4_v2.py et q4_v2.ipynb,
+    et j'ai ajoute les changements dans le fihchier milestone1/question4.py aussi pour ajouter les nouveau colonnes dans le dataframe
+
+
