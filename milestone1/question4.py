@@ -135,7 +135,7 @@ def get_df_from_game(filePath: str) -> pd.DataFrame:
             yCoord.append(ex['coordinates.y'])
       
             last_event = rawDF_copy[rawDF_copy['about.eventIdx'] == (ex["about.eventIdx"]-1)]
-            last_event_type,rebond,xCoord_lastEvent,yCoord_lastEvent,sec_from_lastEvent,dis_from_lastEvent,vitesse,inter = get_info_last_event(ex,last_event)
+            last_event_type,rebond,xCoord_lastEvent,yCoord_lastEvent,sec_from_lastEvent,dis_from_lastEvent,vitesse = get_info_last_event(ex,last_event)
 
             if rebond:
                 if last_event["team.triCode"].values[0] == home:
