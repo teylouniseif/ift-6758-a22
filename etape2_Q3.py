@@ -22,7 +22,7 @@ def logistic_regression(X_train, y_train, X_test: np.array):
     return y_score, y_prob, clf
 
 #For an array of probability (y_prob) and the corresponding labels (y_test), returns the fpr, tpr and auc
-def get_roc_data(y_prob, y_test: np.array):
+def get_roc_data(y_test, y_prob: np.array):
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     roc_auc = auc(fpr, tpr)
     return fpr, tpr, roc_auc
@@ -49,7 +49,6 @@ def get_percentile_goal_chance(y_prob, y_test: np.array):
                     if ex == 1:
                         count += 1
         num_goals.append(count)
-
 
     return perc, perc_values, num_goals
 

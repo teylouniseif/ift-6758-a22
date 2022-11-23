@@ -18,7 +18,6 @@ def get_info_last_event(current_event :pd.DataFrame,last_event:pd.DataFrame):
     time_last = get_time_sec(last_event["about.periodTime"].values[0],last_event["about.period"].values[0])
     time_current = get_time_sec(current_event["about.periodTime"],current_event["about.period"])
     sec_from_lastEvent = time_current - time_last
-    inter = (time_current,time_last)
 
 
     dis_from_lastEvent= np.sqrt((x_current - xCoord_lastEvent) ** 2 + (y_current - yCoord_lastEvent) ** 2)
@@ -29,7 +28,7 @@ def get_info_last_event(current_event :pd.DataFrame,last_event:pd.DataFrame):
     
 
 
-    return last_event_type,rebond,xCoord_lastEvent,yCoord_lastEvent,sec_from_lastEvent,dis_from_lastEvent,vitesse,inter
+    return last_event_type,rebond,xCoord_lastEvent,yCoord_lastEvent,sec_from_lastEvent,dis_from_lastEvent,vitesse
 
 
 def get_time_sec(periodTime :str,period: int):
