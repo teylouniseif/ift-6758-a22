@@ -16,3 +16,5 @@ sklearn
 comet_ml
 jupyter
 xgboost
+ray
+
