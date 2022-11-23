@@ -9,7 +9,7 @@ import math
 # The function create_full_df can now create a DF with all files in a directory
 
 
-def create_full_df(directory: str) -> pd.DataFrame:
+def create_full_df(directory: str, parent_dir=None) -> pd.DataFrame:
     """
     Function that takes a directory of json game files, iterates through all of them to create a pd.Dataframe
     where each event of every match of every season in te directory represent one row.
@@ -17,7 +17,7 @@ def create_full_df(directory: str) -> pd.DataFrame:
     itself on the sub-directory
     Only the events of type "Shot" and "Goal" are added to the dataframe
     """
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = parent_dir if parent_dir else os.path.dirname(os.path.abspath(__file__))
     directory = os.path.join(current_dir, directory)
     dfs = []
     for fileName in os.listdir(directory):
