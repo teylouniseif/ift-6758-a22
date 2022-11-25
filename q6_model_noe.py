@@ -35,7 +35,8 @@ class SVM:
     
     def predict(self):
         self.y_test_pred = self.svm.predict(self.X_test)
-        return self.y_test_pred
+        self.y_test_prob = self.svm.predict_proba(self.X_test)
+        return self.y_test_pred, self.y_test_prob
 
     def roc_auc_curve(self):
         self.y_train_pred_proba = self.svm.decision_function(self.X_train)
