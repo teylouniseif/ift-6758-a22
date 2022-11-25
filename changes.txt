@@ -19,3 +19,8 @@
     Question 5 completée. Ajouter un fichier utils pour les fonctions utilisées fréquemment
 
 
+2022-11-24 (Hanrui):
+j'ai creer un model random forest pour le q6 avec l'accuracy = 0.903 et l'auc = 0.722, le lien de expérience de modele et metrique 
+est:https://www.comet.com/teylouniseifu/ift-6758-a22/7ced5a0234f34a449b212760baa5ff45?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=wall
+
+
