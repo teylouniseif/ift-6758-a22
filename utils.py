@@ -116,3 +116,6 @@ def create_plots(X_test, ytest, y_pred, scenario_title, experiment):
     disp = CalibrationDisplay.from_predictions(ytest, y_pred, color="red", name=f"{scenario_title}", alpha=0.5, ax=ax_calibration_curve, n_bins=10)
     
     experiment.log_figure(figure=fig)
+
+    return fpr_d, tpr_d, perc_d, goal_rate_d, cum_values_d, ytest, y_pred
+
