@@ -61,12 +61,12 @@ def grid_search(X, Y, model):
 
 #ytest = y_test['Est_un_but']
 
-def create_plots(X_test, ytest, y_pred, scenario_title):
+def create_plots(X_test, ytest, y_pred, scenario_title, experiment):
 
     lw = 2
     fpr_d, tpr_d, roc_auc_d = get_roc_data(ytest, y_pred)
-    plt.figure()
-    plt.plot(fpr_d,tpr_d,color="red",lw=lw,alpha=0.5,label=f"ROC curve {scenario_title} (area = %0.2f)" % roc_auc_d)
+    fig = plt.figure()
+    line = plt.plot(fpr_d,tpr_d,color="red",lw=lw,alpha=0.5,label=f"ROC curve {scenario_title} (area = %0.2f)" % roc_auc_d)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
     plt.xlabel("False Positive Rate")
@@ -74,11 +74,14 @@ def create_plots(X_test, ytest, y_pred, scenario_title):
     plt.title("Receiver operating characteristic example")
     plt.legend(loc="lower right")
     plt.show()
+    
+    experiment.log_figure(figure=fig)
+    experiment.log_metric('roc', roc_auc_d)
 
     perc_d, perc_values_d, num_goals_d = get_percentile_goal_chance(y_pred, ytest)
     goal_rate_d = [i*100 for i in perc_values_d]
-    plt.figure()
-    plt.plot(perc_d,goal_rate_d,color="red",alpha=0.5,lw=lw,label=f"{scenario_title}")
+    fig = plt.figure()
+    line = plt.plot(perc_d,goal_rate_d,color="red",alpha=0.5,lw=lw,label=f"{scenario_title}")
     plt.xlim([100, 0])
     #plt.ylim([0, 100])
     plt.xlabel("Shot probability model percentile")
@@ -86,14 +89,16 @@ def create_plots(X_test, ytest, y_pred, scenario_title):
     plt.title("Goal Rate")
     plt.legend(loc="upper right")
     plt.show()
-
+    
+    experiment.log_figure(figure=fig)
+    
     
     cum_values_d = np.cumsum(num_goals_d)
     sum = np.sum(num_goals_d)/100
     cum_values_d = [i/sum for i in cum_values_d]
     cum_values_d = cum_values_d[::-1]
-    plt.figure()
-    plt.plot(perc_d,cum_values_d,color="red",alpha=0.5,lw=lw,label=f"{scenario_title}")
+    fig = plt.figure()
+    line = plt.plot(perc_d,cum_values_d,color="red",alpha=0.5,lw=lw,label=f"{scenario_title}")
     plt.xlim([-5, 105])
     plt.ylim([0, 105])
     plt.xlabel("Shot probability model percentile")
@@ -101,9 +106,13 @@ def create_plots(X_test, ytest, y_pred, scenario_title):
     plt.title("Cumulative % of goals")
     plt.legend(loc="lower right")
     plt.show()
+    
+    experiment.log_figure(figure=fig)
 
     X_val_d = np.array(X_test)
     X_val_d = X_val_d.reshape(-1, 1)
     fig = plt.figure(figsize=(10,10))
     ax_calibration_curve = fig.add_subplot(GridSpec(4,2)[:2,:2])
     disp = CalibrationDisplay.from_predictions(ytest, y_pred, color="red", name=f"{scenario_title}", alpha=0.5, ax=ax_calibration_curve, n_bins=10)
+    
+    experiment.log_figure(figure=fig)
